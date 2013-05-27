@@ -13,11 +13,19 @@
 
 # Find the drupal root directory (minus the trailing 'docroot') from the current path
 # This assumes that Apache's web root is /var/www/ and won't work otherwise
-$drupal_root = preg_replace("/\/var\/www/", "", realpath(''));
-$drupal_root = preg_replace("/docroot.*/", "", $drupal_root);
+if (! isset($thisMultisite)) $thisMultisite = '';
+if (strlen($thisMultisite) == 0) {
+  $drupal_root = preg_replace("/\/var\/www/", "", realpath(''));
+  $drupal_root = preg_replace("/\/docroot.*/", "", $drupal_root);
+} else {
+  $drupal_root = preg_replace("/\/var\/www/", "", $thisMultisite);
+  $drupal_root = preg_replace("/\/docroot/", "", $drupal_root);
+}
+
+#$drupal_root = preg_replace("/docroot.*/", "", $drupal_root);
 
 # Build the path where the include file should be
-$include_path = '/var/www/site-php/ilr' . $drupal_root . 'settings-php.inc';
+$include_path = '/var/www/site-php/ilr' . $drupal_root . '/settings-php.inc';
 if (file_exists($include_path)) {
   require($include_path);
 }
@@ -49,7 +57,7 @@ else {
           <div class="messages error">
             <h2 class="element-invisible">Error message</h2>
             <?php
-              print 'There was a problem initializing Drupal. Drupal can\'t load because database settings have not been provided. <br />Please create a database settings file at <em class="placeholder">' . $include_path .  ' [' . realpath('') . ']</em> and try again. ' . preg_replace("/\/var\/www/", "", realpath(''));
+              print 'There was a problem initializing Drupal. Drupal can\'t load because database settings have not been provided. <br />Please create a database settings file at <em class="placeholder">' . $include_path .  '</em> and try again.';
             ?>
           </div>
         </div>
